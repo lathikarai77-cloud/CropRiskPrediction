@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Crop Risk Prediction</title>
+
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+
+<!-- Navigation Bar -->
+<nav class="navbar">
+
+    <div class="logo">
+        🌱 CropRiskPrediction
+    </div>
+
+    <div class="nav-links">
+
+        <a href="{{ url_for('home') }}">
+            Home
+        </a>
+
+        <a href="{{ url_for('dashboard') }}">
+            Dashboard
+        </a>
+
+        <a href="{{ url_for('logout') }}">
+            Logout
+        </a>
+
+    </div>
+
+</nav>
+
+
+<!-- Main Content -->
+<div class="prediction-container">
+
+    <h1>🌱 Crop Risk Prediction</h1>
+
+    <p class="subtitle">
+        Enter the environmental conditions of your crop
+        to predict disease risk.
+    </p>
+
+
+    <!-- Prediction Form -->
+    <form method="POST" action="{{ url_for('home') }}">
+
+
+        <!-- Crop Selection -->
+        <div class="input-group">
+
+            <label for="crop">
+                🌱 Select Crop
+            </label>
+
+            <select name="crop" id="crop" required>
+
+                {% for c in crops %}
+
+                    <option value="{{ c }}"
+                        {% if c == crop %}selected{% endif %}>
+
+                        {{ c }}
+
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+        </div>
+
+
+        <!-- Temperature -->
+        <div class="input-group">
+
+            <label for="temperature">
+                🌡️ Temperature (°C)
+            </label>
+
+            <input
+                type="number"
+                step="0.1"
+                id="temperature"
+                name="temperature"
+                placeholder="Example: 26.8"
+                value="{{ temperature if temperature is defined and temperature is not none else '' }}"
+                min="0"
+                max="60"
+                required
+            >
+
+        </div>
+
+
+        <!-- Humidity -->
+        <div class="input-group">
+
+            <label for="humidity">
+                💧 Humidity (%)
+            </label>
+
+            <input
+                type="number"
+                step="0.1"
+                id="humidity"
+                name="humidity"
+                placeholder="Example: 68"
+                value="{{ humidity if humidity is defined and humidity is not none else '' }}"
+                min="0"
+                max="100"
+                required
+            >
+
+        </div>
+
+
+        <!-- Leaf Wetness -->
+        <div class="input-group">
+
+            <label for="leaf_wetness">
+                🍃 Leaf Wetness
+            </label>
+
+            <input
+                type="number"
+                step="1"
+                id="leaf_wetness"
+                name="leaf_wetness"
+                placeholder="Example: 10"
+                value="{{ leaf_wetness if leaf_wetness is defined and leaf_wetness is not none else '' }}"
+                min="0"
+                max="100"
+                required
+            >
+
+        </div>
+
+
+        <!-- Predict Button -->
+        <button type="submit">
+            🔍 Predict Risk
+        </button>
+
+    </form>
+
+
+    <!-- Error / Alert -->
+    {% if error %}
+
+    <div class="alert">
+        {{ error }}
+    </div>
+
+    {% endif %}
+
+
+    <!-- Prediction Result -->
+    {% if prediction %}
+
+    <div class="result">
+
+        <h2>
+            🔍 Prediction Result
+        </h2>
+
+
+        <!-- Risk Level -->
+        <h3>
+
+            Risk Level:
+
+            <span>
+                {{ prediction.risk_level }}
+            </span>
+
+        </h3>
+
+
+        <!-- Alert -->
+        {% if alert %}
+
+        <div class="alert">
+
+            {{ alert }}
+
+        </div>
+
+        {% endif %}
+
+
+        <!-- Environmental Conditions -->
+        <div class="conditions">
+
+            <h3>
+                🌡️ Environmental Conditions
+            </h3>
+
+            <p>
+
+                <strong>
+                    Crop:
+                </strong>
+
+                {{ prediction.crop }}
+
+            </p>
+
+            <p>
+
+                <strong>
+                    Temperature:
+                </strong>
+
+                {{ prediction.temperature }} °C
+
+            </p>
+
+            <p>
+
+                <strong>
+                    Humidity:
+                </strong>
+
+                {{ prediction.humidity }} %
+
+            </p>
+
+            <p>
+
+                <strong>
+                    Leaf Wetness:
+                </strong>
+
+                {{ prediction.leaf_wetness }}
+
+            </p>
+
+        </div>
+
+
+        <!-- Disease Risks -->
+        <div class="disease-section">
+
+            <h3>
+                🚨 Disease Risks
+            </h3>
+
+            {% if prediction.disease_risks %}
+
+            <ul>
+
+                {% for disease in prediction.disease_risks %}
+
+                <li>
+                    {{ disease }}
+                </li>
+
+                {% endfor %}
+
+            </ul>
+
+            {% else %}
+
+            <p>
+                No major disease risk detected.
+            </p>
+
+            {% endif %}
+
+        </div>
+
+
+        <!-- Recommendation -->
+        <div class="recommendation">
+
+            <h3>
+                💡 Recommendation
+            </h3>
+
+            <p>
+                {{ prediction.recommendation }}
+            </p>
+
+        </div>
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+</body>
+
+</html>

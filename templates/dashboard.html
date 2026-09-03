@@ -1,0 +1,1419 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+```
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Crop Risk Prediction Dashboard</title>
+
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}">
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+```
+
+</head>
+
+<body>
+
+<!-- =========================================================
+     NAVIGATION BAR
+========================================================= -->
+
+<nav class="navbar">
+
+```
+<div class="logo">
+    🌱 CropRiskPrediction
+</div>
+
+<div class="nav-links">
+
+    <a href="{{ url_for('home') }}">Home</a>
+
+    <a href="{{ url_for('dashboard') }}">Dashboard</a>
+
+    <a href="{{ url_for('logout') }}">Logout</a>
+
+</div>
+```
+
+</nav>
+
+<!-- =========================================================
+     DASHBOARD
+========================================================= -->
+
+<div class="dashboard-container">
+
+```
+<h1>🌱 Crop Risk Prediction Dashboard</h1>
+
+<p class="subtitle">
+    Welcome, {{ user_name }} 👋
+</p>
+
+<p class="subtitle">
+    Environmental Risk Monitoring for Crop Health
+</p>
+
+
+<!-- =====================================================
+     NOTIFICATIONS
+====================================================== -->
+
+<div class="dashboard-card">
+
+    <h2>
+        🔔 Notifications
+        {% if unread_count > 0 %}
+            <span>({{ unread_count }} unread)</span>
+        {% endif %}
+    </h2>
+
+    {% if notifications %}
+
+    {% for notification in notifications %}
+
+        <div class="notification-card"
+             onclick="openNotification({{ notification['id'] }})"
+             style="cursor: pointer;">
+
+            <p>
+                {{ notification["message"] }}
+            </p>
+
+            <small>
+                {{ notification["created_at"] }}
+            </small>
+
+            <br>
+
+            {% if notification["is_read"] == 1 %}
+
+                <span class="notification-read">
+                    ✓✓ Read
+                </span>
+
+            {% else %}
+
+                <span class="notification-unread">
+                    🔵 Unread
+                </span>
+
+            {% endif %}
+
+        </div>
+
+    {% endfor %}
+
+{% else %}
+
+    <p>
+        ✅ No notifications available.
+    </p>
+
+{% endif %}
+
+</div>
+
+
+<!-- =====================================================
+     LATEST SENSOR VALUES
+====================================================== -->
+
+<div class="cards">
+
+    <div class="card">
+
+        <h3>🌡️ Latest Temperature</h3>
+
+        {% if latest_prediction %}
+
+            <p>
+                {{ latest_prediction["temperature"] }} °C
+            </p>
+
+        {% else %}
+
+            <p>--</p>
+
+        {% endif %}
+
+    </div>
+
+
+    <div class="card">
+
+        <h3>💧 Latest Humidity</h3>
+
+        {% if latest_prediction %}
+
+            <p>
+                {{ latest_prediction["humidity"] }} %
+            </p>
+
+        {% else %}
+
+            <p>--</p>
+
+        {% endif %}
+
+    </div>
+
+
+    <div class="card">
+
+        <h3>🍃 Latest Leaf Wetness</h3>
+
+        {% if latest_prediction %}
+
+            <p>
+                {{ latest_prediction["leaf_wetness"] }}
+            </p>
+
+        {% else %}
+
+            <p>--</p>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     RISK SUMMARY
+====================================================== -->
+
+<div class="risk-summary">
+
+    {% set low_count = 0 %}
+    {% set medium_count = 0 %}
+    {% set high_count = 0 %}
+
+    {% for row in risk_summary %}
+
+        {% if row["risk_level"] == "Low" %}
+
+            {% set low_count = row["count"] %}
+
+        {% elif row["risk_level"] == "Medium" %}
+
+            {% set medium_count = row["count"] %}
+
+        {% elif row["risk_level"] == "High" %}
+
+            {% set high_count = row["count"] %}
+
+        {% endif %}
+
+    {% endfor %}
+
+
+    <div class="summary-card low-summary">
+
+        <h3>🟢 Low Risk</h3>
+
+        <p>{{ low_count }}</p>
+
+        <span>Predictions</span>
+
+    </div>
+
+
+    <div class="summary-card medium-summary">
+
+        <h3>🟡 Medium Risk</h3>
+
+        <p>{{ medium_count }}</p>
+
+        <span>Predictions</span>
+
+    </div>
+
+
+    <div class="summary-card high-summary">
+
+        <h3>🔴 High Risk</h3>
+
+        <p>{{ high_count }}</p>
+
+        <span>Predictions</span>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     CROP-WISE RISK
+====================================================== -->
+
+<div class="dashboard-card">
+
+    <h2>🌱 Crop-wise Risk Monitoring</h2>
+
+    {% if crop_risk %}
+
+    <div class="table-container">
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>Crop</th>
+
+                    <th>Risk Level</th>
+
+                    <th>Predictions</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {% for row in crop_risk %}
+
+                <tr>
+
+                    <td>
+                        🌱 {{ row["crop"] }}
+                    </td>
+
+                    <td>
+
+                        {% if row["risk_level"] == "High" %}
+
+                            🔴 High
+
+                        {% elif row["risk_level"] == "Medium" %}
+
+                            🟡 Medium
+
+                        {% else %}
+
+                            🟢 Low
+
+                        {% endif %}
+
+                    </td>
+
+                    <td>
+                        {{ row["count"] }}
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    {% else %}
+
+        <p>No crop prediction data available yet.</p>
+
+    {% endif %}
+
+</div>
+
+
+<!-- =====================================================
+     CROP RISK CHART
+====================================================== -->
+
+<div class="chart-container">
+
+    <h2>📊 Crop-wise Risk Distribution</h2>
+
+    <canvas id="cropRiskChart"></canvas>
+
+</div>
+
+
+<!-- =====================================================
+     DISEASE MONITORING
+====================================================== -->
+
+<div class="dashboard-card">
+
+    <h2>🌿 Disease Monitoring</h2>
+
+    {% if disease_summary %}
+
+        <div class="disease-cards">
+
+            {% for row in disease_summary %}
+
+                <div class="disease-card">
+
+                    <h3>
+                        🦠 {{ row["disease_risks"] }}
+                    </h3>
+
+                    <p>
+                        {{ row["count"] }}
+                    </p>
+
+                    <span>
+                        Times Detected
+                    </span>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% else %}
+
+        <p>
+            No disease data available yet.
+        </p>
+
+    {% endif %}
+
+</div>
+
+
+<!-- =====================================================
+     DISEASE CHART
+====================================================== -->
+
+<div class="chart-container">
+
+    <h2>📊 Disease Detection Frequency</h2>
+
+    <p>
+        Number of times disease risks have been detected
+    </p>
+
+    <canvas id="diseaseChart"></canvas>
+
+</div>
+
+
+<!-- =====================================================
+     LATEST ML PREDICTION
+====================================================== -->
+
+<div class="dashboard-card">
+
+    <h2>🔍 Latest ML Prediction</h2>
+
+    {% if latest_prediction %}
+
+        <h3>
+            🌱 Crop:
+            {{ latest_prediction["crop"] }}
+        </h3>
+
+
+        <!-- RISK STATUS -->
+
+        {% if latest_prediction["risk_level"] == "High" %}
+
+            <div class="high-risk-alert">
+
+                <h2>
+                    🔴 HIGH RISK
+                </h2>
+
+                <p>
+                    🚨 HIGH DISEASE RISK DETECTED!
+                </p>
+
+                <p>
+                    Immediate preventive action is recommended.
+                </p>
+
+            </div>
+
+
+        {% elif latest_prediction["risk_level"] == "Medium" %}
+
+            <div class="medium-risk-alert">
+
+                <h3>
+                    🟡 MEDIUM RISK
+                </h3>
+
+                <p>
+                    Continue monitoring the crop carefully.
+                </p>
+
+            </div>
+
+
+        {% else %}
+
+            <div class="low-risk-alert">
+
+                <h3>
+                    🟢 LOW RISK
+                </h3>
+
+                <p>
+                    Conditions are currently favorable.
+                </p>
+
+            </div>
+
+        {% endif %}
+
+
+        <!-- ENVIRONMENT -->
+
+        <h3>
+            🌡️ Environmental Conditions
+        </h3>
+
+        <p>
+            <strong>Temperature:</strong>
+            {{ latest_prediction["temperature"] }} °C
+        </p>
+
+        <p>
+            <strong>Humidity:</strong>
+            {{ latest_prediction["humidity"] }} %
+        </p>
+
+        <p>
+            <strong>Leaf Wetness:</strong>
+            {{ latest_prediction["leaf_wetness"] }}
+        </p>
+
+
+        <!-- DISEASES -->
+
+        <h3>
+            🌿 Disease Risks
+        </h3>
+
+        {% if latest_prediction["disease_risks"] %}
+
+            <p>
+                {{ latest_prediction["disease_risks"] }}
+            </p>
+
+        {% else %}
+
+            <p>
+                No major disease risks detected.
+            </p>
+
+        {% endif %}
+
+
+        <!-- RECOMMENDATION -->
+
+        <h3>
+            💡 Recommendation
+        </h3>
+
+        <p>
+            {{ latest_prediction["recommendation"] }}
+        </p>
+
+
+        <!-- TIME -->
+
+        <p>
+
+            <strong>
+                Prediction Time:
+            </strong>
+
+            {{ latest_prediction["timestamp"] }}
+
+        </p>
+
+    {% else %}
+
+        <p>
+            No prediction has been made yet.
+        </p>
+
+        <p>
+            Go to the Home page and make a crop risk prediction.
+        </p>
+
+    {% endif %}
+
+</div>
+
+
+<!-- =====================================================
+     TEMPERATURE CHART
+====================================================== -->
+
+<div class="chart-container">
+
+    <h2>🌡️ Temperature Monitoring</h2>
+
+    <canvas id="temperatureChart"></canvas>
+
+</div>
+
+
+<!-- =====================================================
+     HUMIDITY CHART
+====================================================== -->
+
+<div class="chart-container">
+
+    <h2>💧 Humidity Monitoring</h2>
+
+    <canvas id="humidityChart"></canvas>
+
+</div>
+
+
+<!-- =====================================================
+     LEAF WETNESS CHART
+====================================================== -->
+
+<div class="chart-container">
+
+    <h2>🍃 Leaf Wetness Monitoring</h2>
+
+    <canvas id="leafWetnessChart"></canvas>
+
+</div>
+
+
+<!-- =====================================================
+     RISK DISTRIBUTION
+====================================================== -->
+
+<div class="chart-container">
+
+    <h2>📊 Risk Level Distribution</h2>
+
+    <canvas id="riskChart"></canvas>
+
+</div>
+
+
+<!-- =====================================================
+     RISK TREND
+====================================================== -->
+
+<div class="chart-container">
+
+    <h2>📈 Risk Trend</h2>
+
+    <p>
+        Recent crop disease risk predictions over time
+    </p>
+
+    <canvas id="riskTrendChart"></canvas>
+
+</div>
+
+
+<!-- =====================================================
+     PREDICTION HISTORY
+====================================================== -->
+
+<div class="dashboard-card">
+
+    <h2>📋 Prediction History</h2>
+
+    <p>
+        Recent crop disease risk predictions
+    </p>
+
+    {% if predictions %}
+
+    <div class="table-container">
+
+        <table class="prediction-table">
+
+            <thead>
+
+                <tr>
+
+                    <th>Time</th>
+                    <th>Crop</th>
+                    <th>Temperature</th>
+                    <th>Humidity</th>
+                    <th>Leaf Wetness</th>
+                    <th>Risk</th>
+                    <th>Disease Risks</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {% for row in predictions %}
+
+                <tr>
+
+                    <td>
+                        {{ row["timestamp"] }}
+                    </td>
+
+                    <td>
+                        🌱 {{ row["crop"] }}
+                    </td>
+
+                    <td>
+                        {{ row["temperature"] }} °C
+                    </td>
+
+                    <td>
+                        {{ row["humidity"] }} %
+                    </td>
+
+                    <td>
+                        {{ row["leaf_wetness"] }}
+                    </td>
+
+                    <td>
+
+                        {% if row["risk_level"] == "High" %}
+
+                            <span class="risk-high">
+                                🔴 High
+                            </span>
+
+                        {% elif row["risk_level"] == "Medium" %}
+
+                            <span class="risk-medium">
+                                🟡 Medium
+                            </span>
+
+                        {% else %}
+
+                            <span class="risk-low">
+                                🟢 Low
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+                    <td>
+                        {{ row["disease_risks"] }}
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    {% else %}
+
+        <p>
+            No predictions have been recorded yet.
+        </p>
+
+    {% endif %}
+
+</div>
+
+
+<!-- =====================================================
+     HIGH RISK ALERTS
+====================================================== -->
+
+<div class="dashboard-card">
+
+    <h2>🚨 Recent High-Risk Alerts</h2>
+
+    {% if high_risk_alerts %}
+
+    <div class="table-container">
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>Time</th>
+                    <th>Crop</th>
+                    <th>Temperature</th>
+                    <th>Humidity</th>
+                    <th>Leaf Wetness</th>
+                    <th>Diseases</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {% for alert in high_risk_alerts %}
+
+                <tr>
+
+                    <td>
+                        {{ alert["timestamp"] }}
+                    </td>
+
+                    <td>
+                        🌱 {{ alert["crop"] }}
+                    </td>
+
+                    <td>
+                        {{ alert["temperature"] }} °C
+                    </td>
+
+                    <td>
+                        {{ alert["humidity"] }} %
+                    </td>
+
+                    <td>
+                        {{ alert["leaf_wetness"] }}
+                    </td>
+
+                    <td>
+                        {{ alert["disease_risks"] }}
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    {% else %}
+
+        <p>
+            ✅ No recent high-risk alerts.
+        </p>
+
+    {% endif %}
+
+</div>
+
+
+<!-- =====================================================
+     ML MODEL PERFORMANCE
+====================================================== -->
+
+<div class="dashboard-card">
+
+    <h2>🤖 ML Model Performance</h2>
+
+    <div class="accuracy-card">
+
+        <h3>Model Accuracy</h3>
+
+        <p>
+            {{ model_accuracy }}%
+        </p>
+
+    </div>
+
+
+    <h3>
+        📊 Classification Metrics
+    </h3>
+
+    <div class="table-container">
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>Risk Level</th>
+                    <th>Precision</th>
+                    <th>Recall</th>
+                    <th>F1-Score</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {% for risk, metrics in model_metrics.items() %}
+
+                <tr>
+
+                    <td>
+
+                        {% if risk == "High" %}
+
+                            🔴 High
+
+                        {% elif risk == "Medium" %}
+
+                            🟡 Medium
+
+                        {% else %}
+
+                            🟢 Low
+
+                        {% endif %}
+
+                    </td>
+
+                    <td>
+                        {{ "%.2f"|format(metrics["precision"] * 100) }}%
+                    </td>
+
+                    <td>
+                        {{ "%.2f"|format(metrics["recall"] * 100) }}%
+                    </td>
+
+                    <td>
+                        {{ "%.2f"|format(metrics["f1"] * 100) }}%
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    <h3>
+        🌿 Feature Importance
+    </h3>
+
+    <div class="feature-importance">
+
+        {% for feature, importance in feature_importance.items() %}
+
+            <div class="feature-item">
+
+                <span>
+                    {{ feature }}
+                </span>
+
+                <strong>
+                    {{ "%.2f"|format(importance * 100) }}%
+                </strong>
+
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+</div>
+
+<!-- =========================================================
+     JAVASCRIPT
+========================================================= -->
+
+<script>
+
+/* =========================================================
+   TEMPERATURE DATA
+========================================================= */
+
+const temperatureData =
+    {{ temperature_data | tojson }};
+
+new Chart(
+    document.getElementById("temperatureChart"),
+    {
+        type: "line",
+
+        data: {
+            labels: temperatureData.map(
+                (_, index) => index + 1
+            ),
+
+            datasets: [
+                {
+                    label: "Temperature (°C)",
+
+                    data: temperatureData,
+
+                    borderWidth: 2,
+
+                    fill: false,
+
+                    tension: 0.3
+                }
+            ]
+        },
+
+        options: {
+            responsive: true
+        }
+    }
+);
+
+
+/* =========================================================
+   HUMIDITY DATA
+========================================================= */
+
+const humidityData =
+    {{ humidity_data | tojson }};
+
+new Chart(
+    document.getElementById("humidityChart"),
+    {
+        type: "line",
+
+        data: {
+            labels: humidityData.map(
+                (_, index) => index + 1
+            ),
+
+            datasets: [
+                {
+                    label: "Humidity (%)",
+
+                    data: humidityData,
+
+                    borderWidth: 2,
+
+                    fill: false,
+
+                    tension: 0.3
+                }
+            ]
+        },
+
+        options: {
+            responsive: true
+        }
+    }
+);
+
+
+/* =========================================================
+   LEAF WETNESS DATA
+========================================================= */
+
+const leafWetnessData =
+    {{ leaf_wetness_data | tojson }};
+
+new Chart(
+    document.getElementById("leafWetnessChart"),
+    {
+        type: "line",
+
+        data: {
+            labels: leafWetnessData.map(
+                (_, index) => index + 1
+            ),
+
+            datasets: [
+                {
+                    label: "Leaf Wetness",
+
+                    data: leafWetnessData,
+
+                    borderWidth: 2,
+
+                    fill: false,
+
+                    tension: 0.3
+                }
+            ]
+        },
+
+        options: {
+            responsive: true
+        }
+    }
+);
+
+
+/* =========================================================
+   RISK DISTRIBUTION DATA
+========================================================= */
+
+const riskLabels = [
+    {% for row in risk_summary %}
+        "{{ row['risk_level'] }}",
+    {% endfor %}
+];
+
+const riskValues = [
+    {% for row in risk_summary %}
+        {{ row['count'] }},
+    {% endfor %}
+];
+
+
+new Chart(
+    document.getElementById("riskChart"),
+    {
+        type: "doughnut",
+
+        data: {
+            labels: riskLabels,
+
+            datasets: [
+                {
+                    label: "Risk Level",
+
+                    data: riskValues,
+
+                    borderWidth: 1
+                }
+            ]
+        },
+
+        options: {
+            responsive: true
+        }
+    }
+);
+
+
+/* =========================================================
+   RISK TREND
+========================================================= */
+
+const riskTrendLabels = [
+
+    {% for row in predictions|reverse %}
+
+        "{{ row['timestamp'] }}",
+
+    {% endfor %}
+
+];
+
+
+const riskTrendValues = [
+
+    {% for row in predictions|reverse %}
+
+        {% if row['risk_level'] == 'High' %}
+
+            3,
+
+        {% elif row['risk_level'] == 'Medium' %}
+
+            2,
+
+        {% else %}
+
+            1,
+
+        {% endif %}
+
+    {% endfor %}
+
+];
+
+
+new Chart(
+    document.getElementById("riskTrendChart"),
+    {
+        type: "line",
+
+        data: {
+
+            labels: riskTrendLabels,
+
+            datasets: [
+                {
+                    label: "Crop Risk Level",
+
+                    data: riskTrendValues,
+
+                    borderWidth: 2,
+
+                    fill: false,
+
+                    tension: 0.3
+                }
+            ]
+        },
+
+        options: {
+
+            responsive: true,
+
+            scales: {
+
+                y: {
+
+                    min: 1,
+
+                    max: 3,
+
+                    ticks: {
+
+                        stepSize: 1,
+
+                        callback: function(value) {
+
+                            if (value === 1)
+                                return "Low";
+
+                            if (value === 2)
+                                return "Medium";
+
+                            if (value === 3)
+                                return "High";
+
+                            return value;
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   CROP-WISE RISK CHART
+========================================================= */
+
+const cropData = [
+
+    {% for row in crop_risk %}
+
+    {
+        crop: "{{ row['crop'] }}",
+        risk: "{{ row['risk_level'] }}",
+        count: {{ row['count'] }}
+    },
+
+    {% endfor %}
+
+];
+
+
+const cropNames = [
+    ...new Set(
+        cropData.map(item => item.crop)
+    )
+];
+
+
+const cropLowValues = cropNames.map(
+    crop => {
+
+        const item = cropData.find(
+            x => x.crop === crop &&
+                 x.risk === "Low"
+        );
+
+        return item ? item.count : 0;
+    }
+);
+
+
+const cropMediumValues = cropNames.map(
+    crop => {
+
+        const item = cropData.find(
+            x => x.crop === crop &&
+                 x.risk === "Medium"
+        );
+
+        return item ? item.count : 0;
+    }
+);
+
+
+const cropHighValues = cropNames.map(
+    crop => {
+
+        const item = cropData.find(
+            x => x.crop === crop &&
+                 x.risk === "High"
+        );
+
+        return item ? item.count : 0;
+    }
+);
+
+
+new Chart(
+    document.getElementById("cropRiskChart"),
+    {
+        type: "bar",
+
+        data: {
+
+            labels: cropNames,
+
+            datasets: [
+
+                {
+                    label: "Low Risk",
+
+                    data: cropLowValues,
+
+                    borderWidth: 1
+                },
+
+                {
+                    label: "Medium Risk",
+
+                    data: cropMediumValues,
+
+                    borderWidth: 1
+                },
+
+                {
+                    label: "High Risk",
+
+                    data: cropHighValues,
+
+                    borderWidth: 1
+                }
+
+            ]
+        },
+
+        options: {
+
+            responsive: true,
+
+            scales: {
+
+                y: {
+
+                    beginAtZero: true,
+
+                    ticks: {
+                        stepSize: 1
+                    }
+
+                }
+
+            }
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   DISEASE MONITORING CHART
+========================================================= */
+
+const diseaseLabels = [
+
+    {% for row in disease_summary %}
+
+        "{{ row['disease_risks'] }}",
+
+    {% endfor %}
+
+];
+
+
+const diseaseValues = [
+
+    {% for row in disease_summary %}
+
+        {{ row['count'] }},
+
+    {% endfor %}
+
+];
+
+
+new Chart(
+    document.getElementById("diseaseChart"),
+    {
+        type: "bar",
+
+        data: {
+
+            labels: diseaseLabels,
+
+            datasets: [
+
+                {
+                    label: "Times Detected",
+
+                    data: diseaseValues,
+
+                    borderWidth: 1
+                }
+
+            ]
+
+        },
+
+        options: {
+
+            responsive: true,
+
+            scales: {
+
+                y: {
+
+                    beginAtZero: true,
+
+                    ticks: {
+                        stepSize: 1
+                    }
+
+                }
+
+            }
+
+        }
+
+    }
+);
+
+</script>
+
+<script>
+
+function openNotification(notificationId) {
+
+    fetch("/notification/read/" + notificationId)
+        .then(() => {
+
+            location.reload();
+
+        });
+
+}
+
+</script>
+
+</body>
+
+</html>

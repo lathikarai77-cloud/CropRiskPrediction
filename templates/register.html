@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farmer Registration</title>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #eef7ee;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+    }
+
+    .register-box {
+        background: white;
+        width: 380px;
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+    }
+
+    h1 {
+        text-align: center;
+        color: #2e7d32;
+        margin-bottom: 10px;
+    }
+
+    .subtitle {
+        text-align: center;
+        color: #666;
+        margin-bottom: 25px;
+    }
+
+    label {
+        display: block;
+        margin-top: 15px;
+        font-weight: bold;
+    }
+
+    input {
+        width: 100%;
+        padding: 11px;
+        margin-top: 7px;
+        box-sizing: border-box;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        font-size: 15px;
+    }
+
+    button {
+        width: 100%;
+        padding: 12px;
+        margin-top: 25px;
+        border: none;
+        border-radius: 8px;
+        background: #2e7d32;
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background: #1b5e20;
+    }
+
+    .login-link {
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    .login-link a {
+        color: #2e7d32;
+        text-decoration: none;
+        font-weight: bold;
+    }
+
+    .error {
+        background: #ffebee;
+        color: #c62828;
+        padding: 10px;
+        border-radius: 7px;
+        margin-bottom: 15px;
+    }
+</style>
+
+</head>
+
+<body>
+
+<div class="register-box">
+
+<h1>🌱 Farmer Registration</h1>
+
+<p class="subtitle">
+    Create your Crop Risk Monitoring account
+</p>
+
+{% if error %}
+    <div class="error">
+        {{ error }}
+    </div>
+{% endif %}
+
+<form method="POST">
+
+    <label>Farmer Name</label>
+    <input
+        type="text"
+        name="name"
+        placeholder="Enter your name"
+        required
+    >
+
+    <label>Email</label>
+    <input
+        type="email"
+        name="email"
+        placeholder="Enter your email"
+        required
+    >
+
+    <label>Password</label>
+    <input
+        type="password"
+        name="password"
+        placeholder="Create a password"
+        required
+    >
+
+    <label>Confirm Password</label>
+    <input
+        type="password"
+        name="confirm_password"
+        placeholder="Confirm your password"
+        required
+    >
+
+    <button type="submit">
+        Create Account
+    </button>
+
+</form>
+
+<div class="login-link">
+    Already have an account?
+    <a href="{{ url_for('login') }}">Login here</a>
+</div>
+
+</div>
+
+</body>
+</html>
