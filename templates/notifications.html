@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Notifications | CropRiskPrediction</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f3f8f3;
+            color: #333;
+            min-height: 100vh;
+        }
+
+        /* ==========================================
+           NAVBAR
+        ========================================== */
+
+        .navbar {
+            min-height: 64px;
+            padding: 0 5%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            border-bottom: 1px solid #dfe9df;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            color: #1b5e20;
+            font-size: 20px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #555;
+            padding: 9px 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .logout {
+            color: #c62828 !important;
+        }
+
+        .logout:hover {
+            background: #ffebee !important;
+        }
+
+        /* ==========================================
+           CONTAINER
+        ========================================== */
+
+        .container {
+            width: 92%;
+            max-width: 1000px;
+            margin: 30px auto 50px;
+        }
+
+        /* ==========================================
+           HEADER
+        ========================================== */
+
+        .page-header {
+            margin-bottom: 25px;
+        }
+
+        .page-header h1 {
+            color: #1b5e20;
+            font-size: 30px;
+            margin-bottom: 7px;
+        }
+
+        .page-header p {
+            color: #6d776d;
+            font-size: 14px;
+        }
+
+        /* ==========================================
+           UNREAD SUMMARY
+        ========================================== */
+
+        .unread-box {
+            padding: 17px 20px;
+            border-radius: 12px;
+            margin-bottom: 22px;
+            font-size: 15px;
+            font-weight: 600;
+            border: 1px solid;
+        }
+
+        .unread-box.has-unread {
+            background: #fff8e1;
+            border-color: #ffe082;
+            color: #6d4c00;
+        }
+
+        .unread-box.no-unread {
+            background: #e8f5e9;
+            border-color: #c8e6c9;
+            color: #256029;
+        }
+
+        .unread-number {
+            font-size: 20px;
+            margin: 0 3px;
+        }
+
+        /* ==========================================
+           NOTIFICATION CARD
+        ========================================== */
+
+        .notification-card {
+            background: white;
+            padding: 22px;
+            border-radius: 15px;
+            margin-bottom: 16px;
+            border: 1px solid #e0e9e0;
+            border-left: 5px solid #9e9e9e;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+            transition: 0.2s;
+        }
+
+        .notification-card:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 7px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .notification-card.unread {
+            background: #fbfffb;
+        }
+
+        .notification-card.high {
+            border-left-color: #d32f2f;
+        }
+
+        .notification-card.medium {
+            border-left-color: #f9a825;
+        }
+
+        .notification-card.irrigation {
+            border-left-color: #1976d2;
+        }
+
+        /* ==========================================
+           HEADER
+        ========================================== */
+
+        .notification-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 13px;
+            flex-wrap: wrap;
+        }
+
+        .notification-type {
+            font-size: 17px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .notification-time {
+            color: #777;
+            font-size: 12px;
+            background: #f5f5f5;
+            padding: 6px 9px;
+            border-radius: 7px;
+        }
+
+        /* ==========================================
+           BADGES
+        ========================================== */
+
+        .badge-row {
+            display: flex;
+            gap: 7px;
+            flex-wrap: wrap;
+            margin-bottom: 14px;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: bold;
+            letter-spacing: 0.2px;
+        }
+
+        .badge-high {
+            background: #ffebee;
+            color: #b71c1c;
+        }
+
+        .badge-medium {
+            background: #fff8e1;
+            color: #8d6e00;
+        }
+
+        .badge-irrigation {
+            background: #e3f2fd;
+            color: #0d47a1;
+        }
+
+        .badge-read {
+            background: #eeeeee;
+            color: #555;
+        }
+
+        .badge-unread {
+            background: #e8f5e9;
+            color: #1b5e20;
+        }
+
+        /* ==========================================
+           MESSAGE
+        ========================================== */
+
+        .notification-message {
+            background: #fafafa;
+            border-radius: 10px;
+            padding: 14px;
+            font-size: 15px;
+            line-height: 1.6;
+            color: #444;
+            margin-bottom: 16px;
+        }
+
+        /* ==========================================
+           ACTION
+        ========================================== */
+
+        .read-button {
+            border: none;
+            background: #2e7d32;
+            color: white;
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+
+        .read-button:hover {
+            background: #1b5e20;
+            transform: translateY(-1px);
+        }
+
+        /* ==========================================
+           EMPTY STATE
+        ========================================== */
+
+        .empty {
+            background: white;
+            padding: 50px 25px;
+            text-align: center;
+            border-radius: 15px;
+            border: 1px solid #e0e9e0;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .empty-icon {
+            font-size: 52px;
+            margin-bottom: 12px;
+        }
+
+        .empty h2 {
+            color: #444;
+            margin-bottom: 10px;
+        }
+
+        .empty p {
+            color: #777;
+            line-height: 1.6;
+            font-size: 14px;
+            max-width: 600px;
+            margin: 5px auto;
+        }
+
+        /* ==========================================
+           MOBILE
+        ========================================== */
+
+        @media (max-width: 800px) {
+
+            .navbar {
+                padding: 12px 4%;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .nav-links {
+                width: 100%;
+                overflow-x: auto;
+                flex-wrap: nowrap;
+                padding-bottom: 3px;
+            }
+
+            .nav-links a {
+                white-space: nowrap;
+            }
+
+            .container {
+                width: 94%;
+                margin-top: 22px;
+            }
+
+            .notification-header {
+                align-items: flex-start;
+                flex-direction: column;
+                gap: 8px;
+            }
+
+        }
+
+        @media (max-width: 500px) {
+
+            .page-header h1 {
+                font-size: 25px;
+            }
+
+            .notification-card {
+                padding: 17px;
+                border-radius: 13px;
+            }
+
+            .notification-message {
+                font-size: 14px;
+            }
+
+            .read-button {
+                width: 100%;
+            }
+
+            .empty {
+                padding: 40px 18px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- ================================================= -->
+<!-- NAVIGATION -->
+<!-- ================================================= -->
+
+<nav class="navbar">
+
+    <div class="logo">
+        🌱 CropRiskPrediction
+    </div>
+
+    <div class="nav-links">
+
+        <a href="{{ url_for('home') }}">
+            Home
+        </a>
+
+        <a href="{{ url_for('dashboard') }}">
+            Dashboard
+        </a>
+
+        <a href="{{ url_for('activity') }}">
+            Activity
+        </a>
+
+        <a href="{{ url_for('irrigation') }}">
+            Irrigation
+        </a>
+
+        <a href="{{ url_for('notifications') }}"
+           class="active">
+            🔔 Notifications
+        </a>
+
+        <a href="{{ url_for('logout') }}"
+           class="logout">
+            Logout
+        </a>
+
+    </div>
+
+</nav>
+
+
+<!-- ================================================= -->
+<!-- MAIN CONTENT -->
+<!-- ================================================= -->
+
+<div class="container">
+
+
+    <div class="page-header">
+
+        <h1>
+            🔔 Notification Center
+        </h1>
+
+        <p>
+            View disease-risk and irrigation alerts for your assigned crop.
+        </p>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- UNREAD SUMMARY -->
+    <!-- ================================================= -->
+
+    {% if unread_count > 0 %}
+
+        <div class="unread-box has-unread">
+
+            🔵 You have
+
+            <span class="unread-number">
+                {{ unread_count }}
+            </span>
+
+            unread notification{% if unread_count != 1 %}s{% endif %}.
+
+        </div>
+
+    {% else %}
+
+        <div class="unread-box no-unread">
+
+            ✅ You have no unread notifications.
+
+        </div>
+
+    {% endif %}
+
+
+    <!-- ================================================= -->
+    <!-- NOTIFICATION LIST -->
+    <!-- ================================================= -->
+
+    {% if notifications %}
+
+        {% for notification in notifications %}
+
+            {% set notification_type =
+                notification["risk_level"]|lower
+            %}
+
+
+            <div class="notification-card
+
+                {% if notification["is_read"] == 0 %}
+                    unread
+                {% endif %}
+
+                {{ notification_type }}">
+
+                <!-- ===================================== -->
+                <!-- HEADER -->
+                <!-- ===================================== -->
+
+                <div class="notification-header">
+
+                    <div class="notification-type">
+
+                        {% if notification["risk_level"] == "High" %}
+
+                            🚨 High Risk Alert
+
+                        {% elif notification["risk_level"] == "Medium" %}
+
+                            ⚠️ Medium Risk Alert
+
+                        {% elif notification["risk_level"] == "Irrigation" %}
+
+                            💧 Irrigation Alert
+
+                        {% else %}
+
+                            🔔 Notification
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <div class="notification-time">
+
+                        🕒 {{ notification["created_at"] }}
+
+                    </div>
+
+                </div>
+
+
+                <!-- ===================================== -->
+                <!-- BADGES -->
+                <!-- ===================================== -->
+
+                <div class="badge-row">
+
+                    {% if notification["risk_level"] == "High" %}
+
+                        <span class="badge badge-high">
+                            🚨 HIGH RISK
+                        </span>
+
+                    {% elif notification["risk_level"] == "Medium" %}
+
+                        <span class="badge badge-medium">
+                            ⚠️ MEDIUM RISK
+                        </span>
+
+                    {% elif notification["risk_level"] == "Irrigation" %}
+
+                        <span class="badge badge-irrigation">
+                            💧 IRRIGATION
+                        </span>
+
+                    {% endif %}
+
+
+                    {% if notification["is_read"] == 0 %}
+
+                        <span class="badge badge-unread">
+                            🔵 UNREAD
+                        </span>
+
+                    {% else %}
+
+                        <span class="badge badge-read">
+                            ✓ READ
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+
+                <!-- ===================================== -->
+                <!-- MESSAGE -->
+                <!-- ===================================== -->
+
+                <div class="notification-message">
+
+                    {{ notification["message"] }}
+
+                </div>
+
+
+                <!-- ===================================== -->
+                <!-- MARK AS READ -->
+                <!-- ===================================== -->
+
+                {% if notification["is_read"] == 0 %}
+
+                    <form
+                        method="POST"
+                        action="{{ url_for(
+                            'mark_notification_read',
+                            notification_id=notification['id']
+                        ) }}"
+                    >
+
+                        <button
+                            type="submit"
+                            class="read-button"
+                        >
+
+                            ✅ Mark as Read
+
+                        </button>
+
+                    </form>
+
+                {% endif %}
+
+            </div>
+
+        {% endfor %}
+
+
+    {% else %}
+
+
+        <!-- ========================================= -->
+        <!-- EMPTY STATE -->
+        <!-- ========================================= -->
+
+        <div class="empty">
+
+            <div class="empty-icon">
+                📭
+            </div>
+
+            <h2>
+                No Notifications
+            </h2>
+
+            <p>
+                You don't have any notifications yet.
+            </p>
+
+            <p>
+                When a disease-risk or irrigation warning
+                is detected, it will appear here.
+            </p>
+
+        </div>
+
+
+    {% endif %}
+
+
+</div>
+
+
+</body>
+
+</html>

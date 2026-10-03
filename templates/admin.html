@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Admin Dashboard - Crop Risk Prediction</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<nav class="navbar">
+
+    <div class="logo">
+        🌱 CropRiskPrediction
+    </div>
+
+    <div class="nav-links">
+
+        <a href="{{ url_for('home') }}">Home</a>
+
+        <a href="{{ url_for('dashboard') }}">Dashboard</a>
+
+        <a href="{{ url_for('activity') }}">Activity</a>
+
+        <a href="{{ url_for('admin_dashboard') }}">
+            👑 Admin
+        </a>
+
+        <a href="{{ url_for('logout') }}">
+            Logout
+        </a>
+
+    </div>
+
+</nav>
+
+
+<div class="dashboard-container">
+
+    <h1>👑 Admin Dashboard</h1>
+
+    <p>
+        <a href="{{ url_for('admin_users') }}">
+            👥 Manage Users
+        </a>
+    </p>
+
+    <p class="subtitle">
+        Welcome, {{ user_name }} 👋
+    </p>
+
+    <p class="subtitle">
+        Manage users and monitor system activities.
+    </p>
+
+
+    <!-- =====================================================
+         USER SUMMARY
+    ====================================================== -->
+
+    <div class="risk-summary">
+
+        <div class="summary-card">
+
+            <h3>👥 Total Users</h3>
+
+            <p>{{ total_users }}</p>
+
+            <span>Registered Users</span>
+
+        </div>
+
+
+        <div class="summary-card">
+
+            <h3>📊 Total Predictions</h3>
+
+            <p>{{ total_predictions }}</p>
+
+            <span>All Users</span>
+
+        </div>
+
+
+        <div class="summary-card high-summary">
+
+            <h3>🚨 High Risk</h3>
+
+            <p>{{ total_high_risk }}</p>
+
+            <span>High-Risk Predictions</span>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         USERS
+    ====================================================== -->
+
+    <div class="dashboard-card">
+
+        <h2>👥 Registered Users</h2>
+
+        {% if users %}
+
+        <div class="table-container">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Role</th>
+                        <th>Registered</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for user in users %}
+
+                    <tr>
+
+                        <td>
+                            {{ user["id"] }}
+                        </td>
+
+                        <td>
+                            👤 {{ user["name"] }}
+                        </td>
+
+                        <td>
+                            {{ user["email"] }}
+                        </td>
+
+                        <td>
+                            {{ user["phone"] or "-" }}
+                        </td>
+
+                        <td>
+
+                            {% if user["is_admin"] == 1 %}
+
+                                👑 Admin
+
+                            {% else %}
+
+                                👨‍🌾 Farmer
+
+                            {% endif %}
+
+                        </td>
+
+                        <td>
+                            {{ user["created_at"] }}
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        {% else %}
+
+            <p>No users registered yet.</p>
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- =====================================================
+         RECENT ACTIVITIES
+    ====================================================== -->
+
+    <div class="dashboard-card">
+
+        <h2>📋 Recent User Activities</h2>
+
+        {% if activities %}
+
+        <div class="table-container">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>User</th>
+                        <th>Activity</th>
+                        <th>Details</th>
+                        <th>Time</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for activity in activities %}
+
+                    <tr>
+
+                        <td>
+                            👤 {{ activity["name"] }}
+                        </td>
+
+                        <td>
+                            {{ activity["activity"] }}
+                        </td>
+
+                        <td>
+                            {{ activity["details"] }}
+                        </td>
+
+                        <td>
+                            {{ activity["created_at"] }}
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        {% else %}
+
+            <p>No activities recorded yet.</p>
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- =====================================================
+         HIGH RISK PREDICTIONS
+    ====================================================== -->
+
+    <div class="dashboard-card">
+
+        <h2>🚨 Recent High-Risk Predictions</h2>
+
+        {% if high_risk_predictions %}
+
+        <div class="table-container">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>User</th>
+                        <th>Crop</th>
+                        <th>Temperature</th>
+                        <th>Humidity</th>
+                        <th>Leaf Wetness</th>
+                        <th>Risk</th>
+                        <th>Time</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for prediction in high_risk_predictions %}
+
+                    <tr>
+
+                        <td>
+                            👤 {{ prediction["name"] }}
+                        </td>
+
+                        <td>
+                            🌱 {{ prediction["crop"] }}
+                        </td>
+
+                        <td>
+                            {{ prediction["temperature"] }} °C
+                        </td>
+
+                        <td>
+                            {{ prediction["humidity"] }} %
+                        </td>
+
+                        <td>
+                            {{ prediction["leaf_wetness"] }}
+                        </td>
+
+                        <td>
+                            🔴 {{ prediction["risk_level"] }}
+                        </td>
+
+                        <td>
+                            {{ prediction["timestamp"] }}
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        {% else %}
+
+            <p>✅ No high-risk predictions yet.</p>
+
+        {% endif %}
+
+    </div>
+
+
+</div>
+
+</body>
+</html>

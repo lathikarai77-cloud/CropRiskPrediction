@@ -821,3 +821,320 @@ body {
     color: green;
     font-weight: bold;
 }
+/* =========================================================
+   MOBILE RESPONSIVE DESIGN
+   ========================================================= */
+
+@media (max-width: 768px) {
+
+    body {
+        font-size: 14px;
+        overflow-x: hidden;
+    }
+
+    /* Navigation */
+    nav,
+    .navbar,
+    .nav-container {
+        flex-wrap: wrap;
+        height: auto;
+        padding: 10px;
+    }
+
+    nav a {
+        font-size: 13px;
+        margin: 4px;
+    }
+
+    /* Main containers */
+    .container,
+    .dashboard-container,
+    .main-container {
+        width: 100%;
+        max-width: 100%;
+        padding: 10px;
+        margin: 0;
+    }
+
+    /* Dashboard cards */
+    .dashboard-grid,
+    .cards,
+    .card-grid,
+    .stats-grid {
+        grid-template-columns: 1fr !important;
+        gap: 12px;
+    }
+
+    .dashboard-card,
+    .card {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 15px;
+    }
+
+    /* Sensor cards */
+    .sensor-grid {
+        grid-template-columns: 1fr !important;
+        gap: 10px;
+    }
+
+    /* Tables */
+    table {
+        width: 100%;
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+
+    /* Charts */
+    .chart-container,
+    canvas {
+        max-width: 100%;
+    }
+
+    /* Headings */
+    h1 {
+        font-size: 24px;
+    }
+
+    h2 {
+        font-size: 20px;
+    }
+
+    h3 {
+        font-size: 17px;
+    }
+
+    /* Buttons */
+    button,
+    .btn,
+    input[type="submit"] {
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
+    /* Forms */
+    input,
+    select,
+    textarea {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
+    /* Prediction/history sections */
+    .prediction-card,
+    .history-card,
+    .alert-card {
+        width: 100%;
+        box-sizing: border-box;
+        overflow-wrap: break-word;
+    }
+
+    /* Notification messages */
+    .notification {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+}
+
+
+/* =========================================================
+   SMALL PHONES
+   ========================================================= */
+
+@media (max-width: 480px) {
+
+    body {
+        font-size: 13px;
+    }
+
+    h1 {
+        font-size: 21px;
+    }
+
+    h2 {
+        font-size: 18px;
+    }
+
+    h3 {
+        font-size: 16px;
+    }
+
+    .dashboard-card,
+    .card {
+        padding: 12px;
+    }
+
+    nav a {
+        font-size: 12px;
+        padding: 5px;
+    }
+
+}
+/* =========================================================
+   WHAT SHOULD I DO NOW?
+========================================================= */
+
+.now-section {
+    margin-top: 25px;
+}
+
+.section-title {
+    margin-bottom: 15px;
+}
+
+.section-title h2 {
+    margin-bottom: 5px;
+}
+
+.section-title p {
+    color: #666;
+}
+
+.now-card {
+    background: #e8f8ed;
+    border-left: 6px solid #28a745;
+    padding: 22px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+}
+
+.now-label {
+    font-weight: bold;
+    color: #218838;
+    margin-bottom: 10px;
+}
+
+.now-card h3 {
+    margin: 8px 0;
+    font-size: 20px;
+}
+
+.completed-day-card {
+    background: #f0f7ff;
+    border-left: 6px solid #007bff;
+    padding: 22px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+}
+
+.completed-day-card h3 {
+    margin-bottom: 8px;
+}
+
+
+/* =========================================================
+   ACTIVITY SCHEDULE
+========================================================= */
+
+.schedule-section {
+    margin-top: 20px;
+}
+
+.activity-guide {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.guide-card {
+    padding: 18px;
+    border-radius: 12px;
+    background: #ffffff;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.guide-card.current {
+    border-left: 6px solid #28a745;
+    background: #f0fff4;
+}
+
+.guide-card.completed {
+    border-left: 6px solid #6c757d;
+    background: #f8f9fa;
+}
+
+.guide-card.upcoming {
+    border-left: 6px solid #ffc107;
+    background: #fffdf2;
+}
+
+.guide-time {
+    font-weight: bold;
+    font-size: 17px;
+    margin-bottom: 8px;
+}
+
+.guide-activity {
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+.activity-status {
+    margin-top: 5px;
+}
+
+.status-completed {
+    color: #6c757d;
+    font-weight: bold;
+}
+
+.status-current {
+    color: #218838;
+    font-weight: bold;
+}
+
+.status-upcoming {
+    color: #b88600;
+    font-weight: bold;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 768px) {
+
+    .now-card,
+    .completed-day-card,
+    .guide-card {
+        padding: 15px;
+    }
+
+    .now-card h3 {
+        font-size: 18px;
+    }
+
+    .guide-time {
+        font-size: 16px;
+    }
+
+    .guide-activity {
+        font-size: 15px;
+    }
+}
+/* =========================================================
+   🥔 DISEASE DETECTION BUTTON
+========================================================= */
+
+.feature-button {
+    display: inline-block;
+    margin-top: 15px;
+    padding: 12px 22px;
+    background: #198754;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.feature-button:hover {
+    background: #146c43;
+    transform: translateY(-2px);
+}

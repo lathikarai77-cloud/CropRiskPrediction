@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Potato Disease Detection</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f8f3;
+            color: #26352a;
+        }
+
+        .navbar {
+            background: #176b3a;
+            color: white;
+            padding: 15px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .navbar h2 {
+            margin: 0;
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            margin-left: 15px;
+            font-weight: bold;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 35px auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #176b3a;
+        }
+
+        .upload-card,
+        .result-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        }
+
+        .upload-area {
+            border: 2px dashed #61a875;
+            border-radius: 12px;
+            padding: 35px;
+            text-align: center;
+            background: #f7fbf6;
+        }
+
+        .upload-area input {
+            margin: 20px 0;
+        }
+
+        .btn {
+            display: inline-block;
+            background: #176b3a;
+            color: white;
+            border: none;
+            padding: 13px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .btn:hover {
+            background: #0f542c;
+        }
+
+        .preview {
+            text-align: center;
+            margin-top: 25px;
+        }
+
+        .preview img {
+            max-width: 400px;
+            width: 100%;
+            max-height: 400px;
+            object-fit: contain;
+            border-radius: 12px;
+            border: 1px solid #ddd;
+        }
+
+        .result-title {
+            color: #176b3a;
+            font-size: 25px;
+        }
+
+        .confidence {
+            font-size: 22px;
+            font-weight: bold;
+            margin: 15px 0;
+        }
+
+        .info-box {
+            background: #f1f8f2;
+            border-left: 5px solid #176b3a;
+            padding: 18px;
+            margin-top: 15px;
+            border-radius: 5px;
+        }
+
+        .error {
+            background: #ffecec;
+            color: #a00000;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .note {
+            color: #666;
+            font-size: 14px;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 600px) {
+
+            .container {
+                margin: 15px auto;
+                padding: 12px;
+            }
+
+            .upload-card,
+            .result-card {
+                padding: 20px;
+            }
+
+            .navbar {
+                gap: 10px;
+            }
+
+            .navbar a {
+                margin-left: 5px;
+            }
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <div class="navbar">
+
+        <h2>🌱 Crop Risk System</h2>
+
+        <div>
+            <a href="{{ url_for('dashboard') }}">
+                Dashboard
+            </a>
+
+            <a href="{{ url_for('activity') }}">
+                Activity
+            </a>
+
+            <a href="{{ url_for('notifications') }}">
+                Notifications
+            </a>
+        </div>
+
+    </div>
+
+
+    <div class="container">
+
+        <div class="header">
+
+            <h1>🥔 Potato Disease Detection</h1>
+
+            <p>
+                Upload a clear potato leaf image for AI-based
+                visible disease analysis.
+            </p>
+
+        </div>
+
+
+        {% if error %}
+
+        <div class="error">
+            ⚠️ {{ error }}
+        </div>
+
+        {% endif %}
+
+
+        <div class="upload-card">
+
+            <h2>📷 Upload Potato Leaf Image</h2>
+
+            <form method="POST"
+                  enctype="multipart/form-data">
+
+                <div class="upload-area">
+
+                    <p>
+                        Select a clear image of a potato leaf
+                    </p>
+
+                    <input
+                        type="file"
+                        name="disease_image"
+                        accept="image/png,image/jpeg"
+                        required
+                    >
+
+                    <br>
+
+                    <button
+                        type="submit"
+                        class="btn">
+                        🔍 Analyze Image
+                    </button>
+
+                </div>
+
+            </form>
+
+            <p class="note">
+                Supported formats: JPG, JPEG and PNG.
+                For better results, use a clear image where
+                the leaf is visible.
+            </p>
+
+        </div>
+
+
+        {% if image_url %}
+
+        <div class="result-card">
+
+            <h2>📷 Uploaded Image</h2>
+
+            <div class="preview">
+
+                <img
+                    src="{{ image_url }}"
+                    alt="Uploaded potato leaf"
+                >
+
+            </div>
+
+        </div>
+
+        {% endif %}
+
+
+        {% if prediction %}
+
+        <div class="result-card">
+
+            <h2>🤖 AI Analysis Result</h2>
+
+            <div class="result-title">
+
+                {{ disease_info.name }}
+
+            </div>
+
+            <div class="confidence">
+
+                Confidence:
+                {{ "%.2f"|format(confidence) }}%
+
+            </div>
+
+            <div class="info-box">
+
+                <h3>📋 Analysis</h3>
+
+                <p>
+                    {{ disease_info.description }}
+                </p>
+
+            </div>
+
+            <div class="info-box">
+
+                <h3>🌱 Recommended Action</h3>
+
+                <p>
+                    {{ disease_info.recommendation }}
+                </p>
+
+            </div>
+
+            <p class="note">
+                ⚠️ This is an AI image-analysis result based
+                on visible patterns in the uploaded image.
+                It should be treated as an early detection aid,
+                not a guaranteed agricultural diagnosis.
+            </p>
+
+        </div>
+
+        {% endif %}
+
+        {% if prediction and environmental_data %}
+
+<div class="result-card">
+
+    <h2>🌦️ Environmental Analysis</h2>
+
+    <div class="info-box">
+
+        <h3>🌱 Crop</h3>
+
+        <p>
+            {{ environmental_data.crop }}
+        </p>
+
+    </div>
+
+    <div class="info-box">
+
+        <h3>🌡️ Temperature</h3>
+
+        <p>
+            {{ "%.1f"|format(environmental_data.temperature) }} °C
+        </p>
+
+    </div>
+
+    <div class="info-box">
+
+        <h3>💧 Humidity</h3>
+
+        <p>
+            {{ "%.1f"|format(environmental_data.humidity) }} %
+        </p>
+
+    </div>
+
+    <div class="info-box">
+
+        <h3>🍃 Leaf Wetness</h3>
+
+        <p>
+            {{ environmental_data.leaf_wetness }}
+        </p>
+
+    </div>
+
+    <div class="info-box">
+
+        <h3>⚠️ Environmental Risk</h3>
+
+        <p>
+            <strong>
+                {{ environmental_data.risk_level }}
+            </strong>
+        </p>
+
+    </div>
+
+</div>
+
+
+<div class="result-card">
+
+    <h2>🌱 Combined Crop Analysis</h2>
+
+    <div class="info-box">
+
+        <h3>📷 Image AI Result</h3>
+
+        <p>
+            {{ disease_info.name }}
+        </p>
+
+        <p>
+            Confidence:
+            <strong>
+                {{ "%.2f"|format(confidence) }}%
+            </strong>
+        </p>
+
+    </div>
+
+    <div class="info-box">
+
+        <h3>🌦️ Environmental Risk</h3>
+
+        <p>
+            <strong>
+                {{ environmental_data.risk_level }}
+            </strong>
+        </p>
+
+    </div>
+
+    <div class="info-box">
+
+        <h3>🧑‍🌾 Combined Recommendation</h3>
+
+        <p>
+            {{ combined_recommendation }}
+        </p>
+
+    </div>
+
+    <p class="note">
+        ⚠️ The combined result uses AI image analysis and
+        environmental risk information as an early detection
+        and monitoring aid. It is not a guaranteed agricultural
+        diagnosis.
+    </p>
+
+</div>
+
+{% endif %}
+
+    </div>
+
+</body>
+</html>

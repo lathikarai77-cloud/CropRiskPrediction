@@ -1,156 +1,302 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Farmer Registration</title>
 
-<style>
-    body {
-        font-family: Arial, sans-serif;
-        background: #eef7ee;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh;
-        margin: 0;
-    }
+    <title>Farmer Registration | CropRiskPrediction</title>
 
-    .register-box {
-        background: white;
-        width: 380px;
-        padding: 30px;
-        border-radius: 15px;
-        box-shadow: 0 5px 20px rgba(0,0,0,0.15);
-    }
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-    h1 {
-        text-align: center;
-        color: #2e7d32;
-        margin-bottom: 10px;
-    }
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background:
+                linear-gradient(rgba(236, 248, 237, 0.92), rgba(220, 242, 222, 0.96)),
+                radial-gradient(circle at top right, #c8e6c9, transparent 40%);
+            padding: 20px;
+        }
 
-    .subtitle {
-        text-align: center;
-        color: #666;
-        margin-bottom: 25px;
-    }
+        .register-wrapper {
+            width: 100%;
+            max-width: 450px;
+        }
 
-    label {
-        display: block;
-        margin-top: 15px;
-        font-weight: bold;
-    }
+        .brand {
+            text-align: center;
+            margin-bottom: 18px;
+        }
 
-    input {
-        width: 100%;
-        padding: 11px;
-        margin-top: 7px;
-        box-sizing: border-box;
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        font-size: 15px;
-    }
+        .brand-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #2e7d32;
+            border-radius: 50%;
+            font-size: 32px;
+            box-shadow: 0 8px 20px rgba(46, 125, 50, 0.25);
+        }
 
-    button {
-        width: 100%;
-        padding: 12px;
-        margin-top: 25px;
-        border: none;
-        border-radius: 8px;
-        background: #2e7d32;
-        color: white;
-        font-size: 16px;
-        cursor: pointer;
-    }
+        .brand h1 {
+            color: #1b5e20;
+            font-size: 27px;
+            margin-bottom: 5px;
+        }
 
-    button:hover {
-        background: #1b5e20;
-    }
+        .brand p {
+            color: #607060;
+            font-size: 14px;
+        }
 
-    .login-link {
-        text-align: center;
-        margin-top: 20px;
-    }
+        .register-box {
+            background: rgba(255, 255, 255, 0.98);
+            padding: 32px;
+            border-radius: 20px;
+            box-shadow: 0 15px 45px rgba(27, 94, 32, 0.15);
+            border: 1px solid #dcebdd;
+        }
 
-    .login-link a {
-        color: #2e7d32;
-        text-decoration: none;
-        font-weight: bold;
-    }
+        .register-title {
+            text-align: center;
+            color: #333;
+            font-size: 22px;
+            margin-bottom: 7px;
+        }
 
-    .error {
-        background: #ffebee;
-        color: #c62828;
-        padding: 10px;
-        border-radius: 7px;
-        margin-bottom: 15px;
-    }
-</style>
+        .register-subtitle {
+            text-align: center;
+            color: #777;
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
 
+        .form-group {
+            margin-bottom: 17px;
+        }
+
+        label {
+            display: block;
+            color: #333;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 7px;
+        }
+
+        input {
+            width: 100%;
+            padding: 13px 14px;
+            border: 1px solid #ccd8cc;
+            border-radius: 10px;
+            background: #fafdfa;
+            color: #333;
+            font-size: 15px;
+            outline: none;
+            transition: 0.2s;
+        }
+
+        input:focus {
+            border-color: #43a047;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(67, 160, 71, 0.12);
+        }
+
+        input::placeholder {
+            color: #999;
+        }
+
+        .error {
+            background: #fff0f0;
+            color: #c62828;
+            border: 1px solid #ffcdd2;
+            padding: 12px 14px;
+            border-radius: 10px;
+            margin-bottom: 18px;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .register-btn {
+            width: 100%;
+            padding: 13px;
+            margin-top: 4px;
+            border: none;
+            border-radius: 10px;
+            background: #2e7d32;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .register-btn:hover {
+            background: #1b5e20;
+            transform: translateY(-1px);
+            box-shadow: 0 7px 16px rgba(46, 125, 50, 0.22);
+        }
+
+        .register-btn:active {
+            transform: translateY(0);
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 22px;
+            padding-top: 20px;
+            border-top: 1px solid #eeeeee;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .login-link a {
+            color: #2e7d32;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+
+        .footer-text {
+            text-align: center;
+            color: #7b8b7b;
+            font-size: 12px;
+            margin-top: 18px;
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 15px;
+                align-items: flex-start;
+                padding-top: 25px;
+            }
+
+            .register-box {
+                padding: 25px 20px;
+                border-radius: 16px;
+            }
+
+            .brand h1 {
+                font-size: 23px;
+            }
+
+            .brand-icon {
+                width: 56px;
+                height: 56px;
+                font-size: 28px;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
-<div class="register-box">
+<div class="register-wrapper">
 
-<h1>🌱 Farmer Registration</h1>
+    <div class="brand">
+        <div class="brand-icon">🌱</div>
 
-<p class="subtitle">
-    Create your Crop Risk Monitoring account
-</p>
+        <h1>CropRiskPrediction</h1>
 
-{% if error %}
-    <div class="error">
-        {{ error }}
+        <p>AI-Based Crop Disease & Pest Risk Monitoring</p>
     </div>
-{% endif %}
 
-<form method="POST">
+    <div class="register-box">
 
-    <label>Farmer Name</label>
-    <input
-        type="text"
-        name="name"
-        placeholder="Enter your name"
-        required
-    >
+        <h2 class="register-title">👨‍🌾 Create Farmer Account</h2>
 
-    <label>Email</label>
-    <input
-        type="email"
-        name="email"
-        placeholder="Enter your email"
-        required
-    >
+        <p class="register-subtitle">
+            Register to start monitoring your crops
+        </p>
 
-    <label>Password</label>
-    <input
-        type="password"
-        name="password"
-        placeholder="Create a password"
-        required
-    >
+        {% if error %}
+            <div class="error">
+                ⚠️ {{ error }}
+            </div>
+        {% endif %}
 
-    <label>Confirm Password</label>
-    <input
-        type="password"
-        name="confirm_password"
-        placeholder="Confirm your password"
-        required
-    >
+        <form method="POST">
 
-    <button type="submit">
-        Create Account
-    </button>
+            <div class="form-group">
+                <label for="name">Farmer Name</label>
 
-</form>
+                <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    placeholder="Enter your full name"
+                    autocomplete="name"
+                    required
+                >
+            </div>
 
-<div class="login-link">
-    Already have an account?
-    <a href="{{ url_for('login') }}">Login here</a>
-</div>
+            <div class="form-group">
+                <label for="email">Email Address</label>
+
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="Enter your email"
+                    autocomplete="email"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="Create a password"
+                    autocomplete="new-password"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="confirm_password">Confirm Password</label>
+
+                <input
+                    type="password"
+                    id="confirm_password"
+                    name="confirm_password"
+                    placeholder="Re-enter your password"
+                    autocomplete="new-password"
+                    required
+                >
+            </div>
+
+            <button type="submit" class="register-btn">
+                🌱 Create Farmer Account
+            </button>
+
+        </form>
+
+        <div class="login-link">
+            Already have an account?
+            <a href="{{ url_for('login') }}">Login Here</a>
+        </div>
+
+    </div>
+
+    <div class="footer-text">
+        🌾 Smart farming through AI-powered crop monitoring
+    </div>
 
 </div>
 

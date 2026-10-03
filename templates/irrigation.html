@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Smart Irrigation | CropRiskPrediction</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f3f8f3;
+            color: #333;
+            min-height: 100vh;
+        }
+
+        /* ==========================================
+           NAVBAR
+        ========================================== */
+
+        .navbar {
+            background: white;
+            min-height: 64px;
+            padding: 0 5%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            border-bottom: 1px solid #dfe9df;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            color: #1b5e20;
+            font-size: 20px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #555;
+            padding: 9px 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .logout {
+            color: #c62828 !important;
+        }
+
+        .logout:hover {
+            background: #ffebee !important;
+        }
+
+        /* ==========================================
+           PAGE
+        ========================================== */
+
+        .container {
+            width: 92%;
+            max-width: 1100px;
+            margin: 30px auto 50px;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .page-header h1 {
+            color: #1b5e20;
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .page-header p {
+            color: #6b786b;
+            font-size: 15px;
+        }
+
+        /* ==========================================
+           CARDS
+        ========================================== */
+
+        .card {
+            background: white;
+            padding: 25px;
+            margin-bottom: 22px;
+            border-radius: 16px;
+            border: 1px solid #e0e9e0;
+            box-shadow: 0 5px 18px rgba(0, 0, 0, 0.06);
+        }
+
+        .card h2 {
+            color: #2e7d32;
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card-description {
+            color: #707970;
+            font-size: 14px;
+            margin-top: -10px;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        /* ==========================================
+           CROP CARD
+        ========================================== */
+
+        .crop-card {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            background: linear-gradient(135deg, #f1f8f2, #ffffff);
+        }
+
+        .crop-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 15px;
+            background: #e8f5e9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            flex-shrink: 0;
+        }
+
+        .crop-label {
+            color: #777;
+            font-size: 13px;
+            margin-bottom: 5px;
+        }
+
+        .crop-name {
+            color: #1b5e20;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        /* ==========================================
+           SENSOR GRID
+        ========================================== */
+
+        .sensor-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 22px;
+        }
+
+        .sensor-box {
+            background: #f8fbf8;
+            border: 1px solid #e2ebe2;
+            border-radius: 13px;
+            padding: 18px;
+            text-align: center;
+        }
+
+        .sensor-icon {
+            font-size: 27px;
+            margin-bottom: 8px;
+        }
+
+        .sensor-label {
+            color: #777;
+            font-size: 13px;
+            margin-bottom: 6px;
+        }
+
+        .sensor-value {
+            color: #1b5e20;
+            font-size: 23px;
+            font-weight: bold;
+        }
+
+        /* ==========================================
+           SOIL MOISTURE
+        ========================================== */
+
+        .moisture-value {
+            font-size: 38px;
+            color: #1b5e20;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+
+        .progress-track {
+            width: 100%;
+            height: 15px;
+            background: #e7ece7;
+            border-radius: 20px;
+            overflow: hidden;
+            margin-bottom: 18px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: {{ irrigation["soil_moisture"] if irrigation else 0 }}%;
+            border-radius: 20px;
+            background: #43a047;
+            transition: width 0.4s ease;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 14px;
+            margin-top: 20px;
+        }
+
+        .info-item {
+            background: #f8faf8;
+            padding: 15px;
+            border-radius: 11px;
+            border: 1px solid #e7ece7;
+        }
+
+        .info-item-label {
+            color: #777;
+            font-size: 12px;
+            margin-bottom: 6px;
+        }
+
+        .info-item-value {
+            font-size: 17px;
+            font-weight: bold;
+        }
+
+        /* ==========================================
+           STATUS COLORS
+        ========================================== */
+
+        .low {
+            color: #c62828;
+            font-weight: bold;
+        }
+
+        .medium {
+            color: #ef6c00;
+            font-weight: bold;
+        }
+
+        .good {
+            color: #2e7d32;
+            font-weight: bold;
+        }
+
+        .pump-on {
+            color: #2e7d32;
+            font-weight: bold;
+        }
+
+        .pump-off {
+            color: #c62828;
+            font-weight: bold;
+        }
+
+        .automatic {
+            color: #1565c0;
+            font-weight: bold;
+        }
+
+        /* ==========================================
+           PUMP STATUS
+        ========================================== */
+
+        .pump-panel {
+            display: flex;
+            align-items: center;
+            gap: 22px;
+            padding: 20px;
+            border-radius: 14px;
+            background: #f8faf8;
+            border: 1px solid #e3ebe3;
+        }
+
+        .pump-icon {
+            width: 75px;
+            height: 75px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            flex-shrink: 0;
+        }
+
+        .pump-icon.on {
+            background: #e8f5e9;
+        }
+
+        .pump-icon.off {
+            background: #ffebee;
+        }
+
+        .pump-title {
+            font-size: 20px;
+            margin-bottom: 7px;
+        }
+
+        .pump-description {
+            color: #666;
+            line-height: 1.5;
+            font-size: 14px;
+        }
+
+        /* ==========================================
+           BUTTONS
+        ========================================== */
+
+        .button {
+            display: inline-block;
+            padding: 12px 20px;
+            background: #2e7d32;
+            color: white;
+            text-decoration: none;
+            border-radius: 9px;
+            margin-top: 20px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+
+        .button:hover {
+            background: #1b5e20;
+            transform: translateY(-1px);
+        }
+
+        .off-button {
+            background: #c62828;
+        }
+
+        .off-button:hover {
+            background: #8e0000;
+        }
+
+        /* ==========================================
+           AUTOMATIC INFO
+        ========================================== */
+
+        .auto-info {
+            margin-top: 22px;
+            padding: 17px;
+            background: #eef6ff;
+            border: 1px solid #d5e6f7;
+            border-radius: 11px;
+            color: #315b78;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        .auto-info strong {
+            color: #1565c0;
+        }
+
+        /* ==========================================
+           EMPTY STATE
+        ========================================== */
+
+        .empty {
+            text-align: center;
+            padding: 35px 20px;
+            color: #666;
+        }
+
+        .empty-icon {
+            font-size: 50px;
+            margin-bottom: 12px;
+        }
+
+        .empty h2 {
+            margin-bottom: 10px;
+        }
+
+        .empty p {
+            line-height: 1.5;
+        }
+
+        /* ==========================================
+           LAST UPDATED
+        ========================================== */
+
+        .last-updated {
+            margin-top: 20px;
+            color: #777;
+            font-size: 13px;
+        }
+
+        /* ==========================================
+           RESPONSIVE
+        ========================================== */
+
+        @media (max-width: 800px) {
+
+            .navbar {
+                padding: 12px 4%;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .nav-links {
+                width: 100%;
+                overflow-x: auto;
+                flex-wrap: nowrap;
+                padding-bottom: 3px;
+            }
+
+            .nav-links a {
+                white-space: nowrap;
+            }
+
+            .sensor-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .pump-panel {
+                align-items: flex-start;
+            }
+        }
+
+        @media (max-width: 500px) {
+
+            .container {
+                width: 94%;
+                margin-top: 20px;
+            }
+
+            .page-header h1 {
+                font-size: 25px;
+            }
+
+            .page-header p {
+                font-size: 13px;
+            }
+
+            .card {
+                padding: 19px;
+                border-radius: 13px;
+            }
+
+            .crop-card {
+                gap: 14px;
+            }
+
+            .crop-icon {
+                width: 52px;
+                height: 52px;
+                font-size: 26px;
+            }
+
+            .crop-name {
+                font-size: 20px;
+            }
+
+            .pump-panel {
+                flex-direction: column;
+            }
+
+            .pump-icon {
+                width: 65px;
+                height: 65px;
+            }
+
+            .button {
+                width: 100%;
+                text-align: center;
+            }
+
+            .pump-panel form {
+                width: 100%;
+            }
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<!-- ================================================= -->
+<!-- NAVIGATION -->
+<!-- ================================================= -->
+
+<nav class="navbar">
+
+    <div class="logo">
+        🌱 CropRiskPrediction
+    </div>
+
+    <div class="nav-links">
+
+        <a href="{{ url_for('home') }}">
+            Home
+        </a>
+
+        <a href="{{ url_for('dashboard') }}">
+            Dashboard
+        </a>
+
+        <a href="{{ url_for('activity') }}">
+            Activity
+        </a>
+
+        <a href="{{ url_for('irrigation') }}"
+           class="active">
+            Irrigation
+        </a>
+
+        <a href="{{ url_for('notifications') }}">
+            Notifications
+        </a>
+
+        <a href="{{ url_for('logout') }}"
+           class="logout">
+            Logout
+        </a>
+
+    </div>
+
+</nav>
+
+
+<!-- ================================================= -->
+<!-- MAIN CONTENT -->
+<!-- ================================================= -->
+
+<div class="container">
+
+    <div class="page-header">
+
+        <h1>💧 Smart Irrigation System</h1>
+
+        <p>
+            Automatic soil-moisture monitoring and intelligent irrigation control
+        </p>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- ASSIGNED CROP -->
+    <!-- ================================================= -->
+
+    <div class="card crop-card">
+
+        <div class="crop-icon">
+            🌱
+        </div>
+
+        <div>
+
+            <div class="crop-label">
+                ASSIGNED CROP
+            </div>
+
+            <div class="crop-name">
+                {{ user_crop }}
+            </div>
+
+        </div>
+
+    </div>
+
+
+    {% if irrigation %}
+
+
+    <!-- ================================================= -->
+    <!-- SOIL MOISTURE -->
+    <!-- ================================================= -->
+
+    <div class="card">
+
+        <h2>💧 Soil Moisture Monitoring</h2>
+
+        <p class="card-description">
+            Soil moisture is monitored automatically to determine whether irrigation is required.
+        </p>
+
+        <div class="moisture-value">
+            {{ irrigation["soil_moisture"] }}%
+        </div>
+
+        <div class="progress-track">
+
+            <div class="progress-bar"></div>
+
+        </div>
+
+
+        <div class="info-grid">
+
+            <div class="info-item">
+
+                <div class="info-item-label">
+                    WATER STATUS
+                </div>
+
+                <div class="info-item-value">
+
+                    {% if irrigation["water_status"] == "LOW" %}
+
+                        <span class="low">
+                            🔴 LOW
+                        </span>
+
+                    {% elif irrigation["water_status"] == "MEDIUM" %}
+
+                        <span class="medium">
+                            🟡 MEDIUM
+                        </span>
+
+                    {% else %}
+
+                        <span class="good">
+                            🟢 GOOD
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            <div class="info-item">
+
+                <div class="info-item-label">
+                    OPERATING MODE
+                </div>
+
+                <div class="info-item-value">
+
+                    {% if irrigation["auto_mode"] == 1 %}
+
+                        <span class="automatic">
+                            🤖 Automatic
+                        </span>
+
+                    {% else %}
+
+                        Manual
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="last-updated">
+
+            🕐 Last Updated:
+            <strong>{{ irrigation["updated_at"] }}</strong>
+
+        </div>
+
+
+        <a href="{{ url_for('update_irrigation') }}"
+           class="button">
+
+            🔄 Update Soil Moisture
+
+        </a>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- ENVIRONMENTAL SENSOR -->
+    <!-- ================================================= -->
+
+    <div class="card">
+
+        <h2>🌡️ Environmental Monitoring</h2>
+
+        <p class="card-description">
+            Temperature, humidity and leaf wetness are automatically recorded by the monitoring system.
+        </p>
+
+        <div class="sensor-grid">
+
+            <div class="sensor-box">
+
+                <div class="sensor-icon">
+                    🌡️
+                </div>
+
+                <div class="sensor-label">
+                    Temperature
+                </div>
+
+                <div class="sensor-value">
+                    Automatic
+                </div>
+
+            </div>
+
+
+            <div class="sensor-box">
+
+                <div class="sensor-icon">
+                    💧
+                </div>
+
+                <div class="sensor-label">
+                    Humidity
+                </div>
+
+                <div class="sensor-value">
+                    Automatic
+                </div>
+
+            </div>
+
+
+            <div class="sensor-box">
+
+                <div class="sensor-icon">
+                    🍃
+                </div>
+
+                <div class="sensor-label">
+                    Leaf Wetness
+                </div>
+
+                <div class="sensor-value">
+                    Automatic
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="auto-info">
+
+            <strong>🤖 Automatic Monitoring:</strong>
+
+            The system continuously generates environmental readings and sends
+            them to the crop-risk prediction system. These readings help determine
+            crop disease risk and irrigation requirements.
+
+        </div>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- WATER PUMP -->
+    <!-- ================================================= -->
+
+    <div class="card">
+
+        <h2>🚰 Water Pump Control</h2>
+
+        {% if irrigation["pump_status"] == "ON" %}
+
+            <div class="pump-panel">
+
+                <div class="pump-icon on">
+                    💧
+                </div>
+
+                <div>
+
+                    <div class="pump-title pump-on">
+                        🟢 Pump is currently ON
+                    </div>
+
+                    <div class="pump-description">
+                        Soil moisture is below the safe level.
+                        The irrigation system has turned the pump ON automatically.
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <form method="POST"
+                  action="{{ url_for('pump_off') }}">
+
+                <button type="submit"
+                        class="button off-button">
+
+                    🛑 Turn Pump OFF
+
+                </button>
+
+            </form>
+
+        {% else %}
+
+            <div class="pump-panel">
+
+                <div class="pump-icon off">
+                    🛑
+                </div>
+
+                <div>
+
+                    <div class="pump-title pump-off">
+                        🔴 Pump is currently OFF
+                    </div>
+
+                    <div class="pump-description">
+
+                        {% if irrigation["water_status"] == "MEDIUM" %}
+
+                            Soil moisture is at a medium level.
+                            No irrigation is required right now.
+
+                        {% else %}
+
+                            Soil moisture is sufficient.
+                            Irrigation is not required.
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        {% endif %}
+
+
+        <div class="auto-info">
+
+            <strong>⚙️ Automatic Irrigation Rule:</strong>
+
+            When soil moisture falls below <strong>30%</strong>,
+            the system considers the soil condition LOW and turns the
+            pump ON automatically.
+
+            Between <strong>30% and 60%</strong>, the water status is MEDIUM
+            and the pump remains OFF.
+
+            Above <strong>60%</strong>, the soil condition is considered GOOD.
+
+        </div>
+
+    </div>
+
+
+    {% else %}
+
+
+    <!-- ================================================= -->
+    <!-- NO DATA -->
+    <!-- ================================================= -->
+
+    <div class="card">
+
+        <div class="empty">
+
+            <div class="empty-icon">
+                💧
+            </div>
+
+            <h2>
+                No Irrigation Data
+            </h2>
+
+            <p>
+                No soil-moisture reading is available yet.
+                Click the button below to generate the first reading.
+            </p>
+
+            <a href="{{ url_for('update_irrigation') }}"
+               class="button">
+
+                🔄 Read Soil Moisture
+
+            </a>
+
+        </div>
+
+    </div>
+
+
+    {% endif %}
+
+</div>
+
+
+<script>
+
+    // =================================================
+    // AUTOMATIC SENSOR UPDATE
+    // =================================================
+
+    function updateSensorAutomatically() {
+
+        // Simulated soil-moisture sensor value
+        const soilMoisture =
+            (Math.random() * 70 + 15).toFixed(1);
+
+        // Simulated environmental sensor values
+        const temperature =
+            (24 + Math.random() * 8).toFixed(1);
+
+        const humidity =
+            (60 + Math.random() * 25).toFixed(1);
+
+        const leafWetness =
+            Math.floor(Math.random() * 20);
+
+
+        // =================================================
+        // SENSOR DATA
+        // =================================================
+
+        const data = {
+
+            crop: {{ user_crop | tojson }},
+
+            temperature: temperature,
+
+            humidity: humidity,
+
+            leaf_wetness: leafWetness,
+
+            soil_moisture: soilMoisture
+
+        };
+
+
+        console.log(
+            "🌱 Sending automatic sensor data:",
+            data
+        );
+
+
+        // =================================================
+        // SEND DATA TO FLASK
+        // =================================================
+
+        fetch("/api/sensor-data", {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify(data)
+
+        })
+
+        .then(response => {
+
+            console.log(
+                "API response status:",
+                response.status
+            );
+
+            return response.json().then(result => ({
+
+                status: response.status,
+
+                data: result
+
+            }));
+
+        })
+
+        .then(response => {
+
+            console.log(
+                "API response:",
+                response.data
+            );
+
+
+            if (
+                response.status === 200 &&
+                response.data.status === "success"
+            ) {
+
+                console.log(
+                    "✅ Automatic sensor update successful"
+                );
+
+
+                // Refresh page to display new values
+
+                setTimeout(() => {
+
+                    location.reload();
+
+                }, 500);
+
+
+            } else {
+
+                console.error(
+                    "❌ Automatic sensor update failed:",
+                    response.data
+                );
+
+            }
+
+        })
+
+        .catch(error => {
+
+            console.error(
+                "❌ Sensor connection error:",
+                error
+            );
+
+        });
+
+    }
+
+
+    // =================================================
+    // FIRST AUTOMATIC UPDATE
+    // =================================================
+
+    setTimeout(
+        updateSensorAutomatically,
+        3000
+    );
+
+
+    // =================================================
+    // REPEAT EVERY 30 SECONDS
+    // =================================================
+
+    setInterval(
+        updateSensorAutomatically,
+        30000
+    );
+
+</script>
+
+</body>
+
+</html>

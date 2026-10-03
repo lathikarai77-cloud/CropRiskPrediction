@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>User Details</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+
+<nav class="navbar">
+
+    <div class="logo">
+        🌱 CropRiskPrediction
+    </div>
+
+    <div class="nav-links">
+
+        <a href="{{ url_for('home') }}">Home</a>
+
+        <a href="{{ url_for('dashboard') }}">Dashboard</a>
+
+        <a href="{{ url_for('activity') }}">Activity</a>
+
+        <a href="{{ url_for('admin_dashboard') }}">👑 Admin</a>
+
+        <a href="{{ url_for('admin_users') }}">👥 Users</a>
+
+        <a href="{{ url_for('logout') }}">Logout</a>
+
+    </div>
+
+</nav>
+
+
+<div class="dashboard-container">
+
+    <h1>👤 User Details</h1>
+
+    <div class="dashboard-card">
+
+        <h2>{{ user["name"] }}</h2>
+
+        <p>
+            📧 <strong>Email:</strong>
+            {{ user["email"] }}
+        </p>
+
+        <p>
+            📱 <strong>Phone:</strong>
+            {{ user["phone"] or "-" }}
+        </p>
+
+        <p>
+            👑 <strong>Role:</strong>
+
+            {% if user["is_admin"] == 1 %}
+                Admin
+            {% else %}
+                Farmer
+            {% endif %}
+
+        </p>
+
+        <p>
+            📅 <strong>Registered:</strong>
+            {{ user["created_at"] }}
+        </p>
+
+    </div>
+
+
+    <div class="dashboard-card">
+
+        <h2>📊 Prediction Summary</h2>
+
+        <p>
+            <strong>Total Predictions:</strong>
+            {{ predictions|length }}
+        </p>
+
+        {% for item in risk_summary %}
+
+            <p>
+                {% if item["risk_level"] == "High" %}
+                    🔴
+                {% elif item["risk_level"] == "Medium" %}
+                    🟡
+                {% else %}
+                    🟢
+                {% endif %}
+
+                {{ item["risk_level"] }} Risk:
+                <strong>{{ item["count"] }}</strong>
+            </p>
+
+        {% endfor %}
+
+    </div>
+
+
+    <div class="dashboard-card">
+
+        <h2>📋 Recent Predictions</h2>
+
+        {% if predictions %}
+
+        <div class="table-container">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>Crop</th>
+                        <th>Temperature</th>
+                        <th>Humidity</th>
+                        <th>Leaf Wetness</th>
+                        <th>Risk</th>
+                        <th>Time</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for prediction in predictions[:20] %}
+
+                    <tr>
+
+                        <td>
+                            🌱 {{ prediction["crop"] }}
+                        </td>
+
+                        <td>
+                            {{ prediction["temperature"] }} °C
+                        </td>
+
+                        <td>
+                            {{ prediction["humidity"] }} %
+                        </td>
+
+                        <td>
+                            {{ prediction["leaf_wetness"] }}
+                        </td>
+
+                        <td>
+
+                            {% if prediction["risk_level"] == "High" %}
+                                🔴 High
+                            {% elif prediction["risk_level"] == "Medium" %}
+                                🟡 Medium
+                            {% else %}
+                                🟢 Low
+                            {% endif %}
+
+                        </td>
+
+                        <td>
+                            {{ prediction["timestamp"] }}
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        {% else %}
+
+            <p>No predictions recorded for this user.</p>
+
+        {% endif %}
+
+    </div>
+
+
+    <div class="dashboard-card">
+
+        <h2>📋 User Activity</h2>
+
+        {% if activities %}
+
+            {% for activity in activities %}
+
+                <div class="activity-item">
+
+                    <strong>
+                        {% if "Logged in" in activity["activity"] %}
+                            🔐
+                        {% elif "prediction" in activity["activity"]|lower %}
+                            🤖
+                        {% else %}
+                            📌
+                        {% endif %}
+
+                        {{ activity["activity"] }}
+                    </strong>
+
+                    <p>
+                        {{ activity["details"] }}
+                    </p>
+
+                    <small>
+                        🕒 {{ activity["created_at"] }}
+                    </small>
+
+                </div>
+
+                <hr>
+
+            {% endfor %}
+
+        {% else %}
+
+            <p>No activities recorded.</p>
+
+        {% endif %}
+
+    </div>
+
+
+    <br>
+
+    <a href="{{ url_for('admin_users') }}">
+        ⬅️ Back to User Management
+    </a>
+
+</div>
+
+</body>
+
+</html>
