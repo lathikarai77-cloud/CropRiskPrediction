@@ -5,3 +5,4 @@ pandas
 numpy
 scikit-learn
 Werkzeug
+tensorflow==2.21.0
